@@ -1,0 +1,32 @@
+{
+    "name": "simorgan/wordpress-starter",
+    "description": "A starter WordPress theme created by Si Morgan",
+    "type": "project",
+    "license": "proprietary",
+    "autoload": {
+        "psr-4": {
+            "Simorgan\\WPT\\": "wp-content/themes/starter/functions/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Si Morgan"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "johnpbloch/wordpress": "^6.5",
+        "johnpbloch/wordpress-core-installer": "^2.0"
+    },
+    "extra": {
+        "wordpress-install-dir": "wp"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "allow-plugins": {
+            "composer/installers": true,
+            "johnpbloch/wordpress-core-installer": true
+        }
+    }
+}
