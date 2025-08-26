@@ -26,7 +26,7 @@ export default defineConfig({
     },
     plugins: [
         wp({
-            watch: ["**/*.php"], // Watch all PHP files in the theme
+            watch: ["**/*.php", '**/*.twig'], // Watch all PHP files in the theme
             publicPath: "/wp-content/themes/starter-theme", // adjust to your theme folder
         }),
         fullReload(
