@@ -31,7 +31,9 @@ export default defineConfig({
         }),
         fullReload(
             [
-                'wp-content/themes/starter-theme/**/*.php'
+                '**/*.php',
+                'views/**/*.twig',
+
             ]
         ),
     ],

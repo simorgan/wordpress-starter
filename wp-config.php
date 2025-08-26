@@ -4,14 +4,17 @@
  */
 
 // ** MySQL settings ** //
-define( 'DB_NAME',     'database_name_here' );
-define( 'DB_USER',     'username_here' );
-define( 'DB_PASSWORD', 'password_here' );
+define( 'DB_NAME',     'wordpress-starter' );
+define( 'DB_USER',     'root' );
+define( 'DB_PASSWORD', '12345678' );
 define( 'DB_HOST',     'localhost' );
 
 // Set custom content directory (themes, plugins, uploads)
 define( 'WP_CONTENT_DIR', __DIR__ . '/wp-content' );
 define( 'WP_CONTENT_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/wp-content' );
+
+$table_prefix = 'si_';
+
 
 // Debug mode
 define( 'WP_DEBUG', true );

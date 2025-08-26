@@ -1,5 +1,5 @@
 <?php
-namespace Simorgan\WPT;
+namespace SIWP\WPT;
 
 class Assets_Loader
 {

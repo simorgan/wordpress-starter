@@ -5,8 +5,11 @@
     "license": "proprietary",
     "autoload": {
         "psr-4": {
-            "Simorgan\\WPT\\": "wp-content/themes/starter/functions/"
-        }
+            "SIWP\\WPT\\": "wp-content/themes/starter-theme/functions/"
+        },
+        "files": [
+            "wp-content/themes/starter-theme/functions/bootstrap.php"
+        ]
     },
     "authors": [
         {
@@ -14,9 +17,17 @@
         }
     ],
     "minimum-stability": "stable",
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://wpackagist.org"
+        }
+    ],
     "require": {
         "johnpbloch/wordpress": "^6.5",
-        "johnpbloch/wordpress-core-installer": "^2.0"
+        "johnpbloch/wordpress-core-installer": "^2.0",
+        "wpackagist-plugin/wordpress-seo": "^22.9",
+        "timber/timber": "^2"
     },
     "extra": {
         "wordpress-install-dir": "wp"
