@@ -33,7 +33,7 @@ wp-content/uploads/
 # -----------------------------------------------------------------------------
 # Optional: Ignore plugins/themes you don’t want in Git
 # -----------------------------------------------------------------------------
-content/plugins/*
+wp-content/plugins/*
 # !content/plugins/my-custom-plugin/
-content/themes/*
+wp-content/themes/*
 !content/themes/starter-theme/
