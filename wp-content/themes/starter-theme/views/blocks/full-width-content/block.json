@@ -1,0 +1,27 @@
+{
+  "name": "full-width-content",
+  "title": "Full width content",
+  "description": "A standard full width content block with a heading and a wysiwyg",
+  "category": "siwp",
+  "icon": "format-aside",
+  "keywords": [
+    "full",
+    "width",
+    "content"
+  ],
+  "post_type": [
+    "page"
+  ],
+  "acf": {
+    "mode": "preview"
+  },
+  "supports": {
+    "align": false,
+    "anchor": true,
+    "spacing": {
+      "padding": true,
+      "margin": false
+    }
+  },
+  "apiVersion": 3
+}
