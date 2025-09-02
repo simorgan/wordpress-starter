@@ -27,7 +27,8 @@
         "johnpbloch/wordpress": "^6.5",
         "johnpbloch/wordpress-core-installer": "^2.0",
         "wpackagist-plugin/wordpress-seo": "^22.9",
-        "timber/timber": "^2"
+        "timber/timber": "^2",
+        "stoutlogic/acf-builder": "^1.12"
     },
     "extra": {
         "wordpress-install-dir": "wp"

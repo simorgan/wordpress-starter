@@ -5,7 +5,7 @@ namespace SIWP\WPT;
 use DirectoryIterator;
 use Timber\Timber;
 
-class Theme_blocks
+class Theme_Blocks
 {
 	/**
 	 * Block directories to scan for blocks
@@ -19,22 +19,35 @@ class Theme_blocks
 
 	public function __construct()
 	{
-		
+
 		// WordPress Hooks
 		add_action('init', [$this, 'register_blocks']);
 		add_action('init', [$this, 'register_block_category']);
 		add_filter('timber/loader/loader', [$this, 'register_timber_blocks_path']);
-
+		add_action('acf/init', [$this, 'register_block_fields']);
 		// Remove core blocks and only allow custom blocks
 		add_filter('allowed_block_types_all', [$this, 'allowed_blocks'], 10, 2);
 	}
 
+	public function register_block_fields(): void
+	{
+		$block_directories = $this->discover_block_directories();
+
+		foreach ($block_directories as $block_dir) {
+			$fields_file_path = $block_dir . '/fields.php';
+			if (file_exists($fields_file_path)) {
+				require_once $fields_file_path;
+			}
+		}
+	}
+
 	/**
-	 * Add blocks path to Timber loader
+	 * Add block path to Timber loader
 	 */
 	public function register_timber_blocks_path($loader)
 	{
 		$loader->addPath(get_template_directory() . '/views/blocks', 'blocks');
+
 		return $loader;
 	}
 
@@ -73,9 +86,11 @@ class Theme_blocks
 			$block_json_path = $block_dir . '/block.json';
 
 			if (file_exists($block_json_path)) {
+				// Register the block first
 				register_block_type($block_dir, [
 					'render_callback' => [$this, 'render_block_callback']
 				]);
+
 			}
 		}
 
@@ -129,21 +144,40 @@ class Theme_blocks
 	 */
 	public function render_block_callback($attributes, $content = '', $block = null): void
 	{
-		// Get block name and slug
-		$block_name = $block->name ?? '';
+		// For ACF blocks, the block name is in attributes, not the $block parameter
+		$block_name = $attributes['name'] ?? '';
+
+		// Extract slug from block name
 		$slug = str_replace('acf/', '', $block_name);
+
+		error_log('Block name: ' . $block_name);
+		error_log('Slug: ' . $slug);
 
 		// Prepare context
 		$context = Timber::context();
 		$context['block'] = $attributes;
 		$context['slug'] = $slug;
-		$context['fields'] = function_exists('get_fields') ? get_fields() : [];
+
+		// For ACF blocks, the field data is in $attributes['data']
+		$context['fields'] = $attributes['data'] ?? [];
+
+		// Also make fields available at root level for easier access
+		if (!empty($context['fields'])) {
+			foreach ($context['fields'] as $key => $value) {
+				// Skip the underscore fields (ACF metadata)
+				if (strpos($key, '_') !== 0) {
+					$context[$key] = $value;
+				}
+			}
+		}
 
 		// Apply filters
 		$context = apply_filters('timber/acf-gutenberg-blocks-data', $context);
 
 		// Get template paths
 		$templates = $this->get_block_template_paths($slug);
+
+		error_log('Template paths: ' . print_r($templates, true));
 
 		// Render the block
 		Timber::render($templates, $context);
@@ -158,11 +192,11 @@ class Theme_blocks
 
 		// Try preview template first if in admin
 		if (is_admin()) {
-			$templates[] = "@blocks/{$slug}-preview.twig";
+			$templates[] = "@blocks/{$slug}/{$slug}-preview.twig";
 		}
 
 		// Main template
-		$templates[] = "@blocks/{$slug}.twig";
+		$templates[] = "@blocks/{$slug}/{$slug}.twig";
 
 		return $templates;
 	}
@@ -220,7 +254,6 @@ class Theme_blocks
 			if (file_exists($block_json_path)) {
 				$json_data = json_decode(file_get_contents($block_json_path), true);
 
-				// Check if post_types exists (note: it should be 'post_types' not 'post_type')
 				if (isset($json_data['post_type']) && is_array($json_data['post_type'])) {
 					$block_name = $json_data['name'] ?? 'unknown';
 
