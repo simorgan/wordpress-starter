@@ -14,11 +14,9 @@
  * @since   Timber 0.1
  */
 
-$context          = Timber::context();
+$context = Timber::context();
 $context['posts'] = Timber::get_posts();
-$context['foo']   = 'bar';
-$templates        = array( 'templates/index.twig' );
-//if ( is_home() ) {
-//	array_unshift( $templates, 'front-page.twig', 'home.twig' );
-//}
-Timber::render( $templates, $context );
+
+$templates = array('templates/index.twig');
+
+Timber::render($templates, $context);

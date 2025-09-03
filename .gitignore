@@ -36,4 +36,4 @@ wp-content/uploads/
 wp-content/plugins/*
 # !content/plugins/my-custom-plugin/
 wp-content/themes/*
-!content/themes/starter-theme/
+!wp-content/themes/starter-theme/
