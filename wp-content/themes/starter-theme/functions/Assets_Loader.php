@@ -1,4 +1,5 @@
 <?php
+
 namespace SIWP\WPT;
 
 class Assets_Loader
@@ -11,13 +12,15 @@ class Assets_Loader
 
 	public function __construct()
 	{
-		$this->theme_dir        = get_template_directory();
-		$this->theme_uri        = get_template_directory_uri();
-		$this->vite_dev_server  = 'http://localhost:5173';
-		$this->manifest_file    = $this->theme_dir . '/dist/.vite/manifest.json';
-		$this->is_dev           = $this->check_vite_dev_server();
+		$this->theme_dir = get_template_directory();
+		$this->theme_uri = get_template_directory_uri();
+		$this->vite_dev_server = 'http://localhost:5173';
+		$this->manifest_file = $this->theme_dir . '/dist/.vite/manifest.json';
+		$this->is_dev = $this->check_vite_dev_server();
 
 		add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
+		add_action('enqueue_block_editor_assets', [$this, 'enqueue_editor_assets']);
+
 		add_action('wp_footer', [$this, 'inject_hmr_client']);
 	}
 
@@ -89,6 +92,59 @@ class Assets_Loader
 			}
 		}
 	}
+
+	/**
+	 * Gutenberg/editor assets
+	 */
+	public function enqueue_editor_assets(): void
+	{
+		if ($this->is_dev) {
+			wp_register_script(
+				'theme-editor',
+				$this->vite_dev_server . '/resources/js/editor.js',
+				[],
+				null
+			);
+
+			add_filter('script_loader_tag', function ($tag, $handle) {
+				if ($handle === 'theme-editor') {
+					return str_replace('<script ', '<script type="module" ', $tag);
+				}
+				return $tag;
+			}, 10, 2);
+
+			wp_enqueue_script('theme-editor');
+		} else {
+			if (!file_exists($this->manifest_file)) return;
+			$manifest = json_decode(file_get_contents($this->manifest_file), true);
+
+			if (!empty($manifest['resources/js/editor.js']['file'])) {
+				$entry = $manifest['resources/js/editor.js'];
+
+				// JS
+				wp_enqueue_script(
+					'theme-editor',
+					$this->theme_uri . '/dist/' . $entry['file'],
+					[],
+					null,
+					true
+				);
+
+				// CSS (prefixed app.css + editor.css)
+				if (!empty($entry['css']) && is_array($entry['css'])) {
+					foreach ($entry['css'] as $css_file) {
+						wp_enqueue_style(
+							'theme-editor-style',
+							$this->theme_uri . '/dist/' . $css_file,
+							[],
+							null
+						);
+					}
+				}
+			}
+		}
+	}
+
 
 	/**
 	 * Inject Vite HMR client in dev mode

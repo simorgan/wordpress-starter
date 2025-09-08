@@ -1,2 +1,4 @@
 import "../css/app.css";
-console.log('here')
+
+/* Frontend JS */
+console.log("Frontend loaded");

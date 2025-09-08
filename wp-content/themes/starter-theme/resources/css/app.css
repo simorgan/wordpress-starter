@@ -1,4 +1,5 @@
 @import "base/base.css";
 
-
-
+body {
+    @apply bg-red-500;
+}
