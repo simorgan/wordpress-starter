@@ -23,6 +23,7 @@ function editorCssPrefix() {
                 const result = postcss([
                     postcssPrefixSelector({
                         prefix: '.editor-styles-wrapper .acf-block-preview',
+                        exclude: ["body.frontend", ".wp-block.acf-block-preview"],
                         transform: (prefix, selector, prefixedSelector) => {
                             if (selector.startsWith('html') || selector.startsWith('body')) return prefix;
                             return prefixedSelector;
