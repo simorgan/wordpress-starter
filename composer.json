@@ -1,47 +1,45 @@
 {
-    "name": "simorgan/wordpress-starter",
-    "description": "A starter WordPress theme created by Si Morgan",
-    "type": "project",
-    "license": "proprietary",
-    "autoload": {
-        "psr-4": {
-            "SIWP\\WPT\\": "wp-content/themes/starter-theme/functions/"
-        },
-        "files": [
-            "wp-content/themes/starter-theme/functions/bootstrap.php"
-        ]
+  "name": "simorgan/wordpress-starter",
+  "description": "A starter WordPress theme created by Si Morgan",
+  "type": "project",
+  "license": "proprietary",
+  "autoload": {
+    "psr-4": {
+      "SIWP\\WPT\\": "wp-content/themes/starter-theme/functions/"
     },
-    "authors": [
-        {
-            "name": "Si Morgan"
-        }
-    ],
-    "minimum-stability": "stable",
-    "repositories": [
-        {
-            "type": "composer",
-            "url": "https://wpackagist.org"
-        }
-    ],
-    "require": {
-        "johnpbloch/wordpress": "^6.5",
-        "johnpbloch/wordpress-core-installer": "^2.0",
-        "wpackagist-plugin/wordpress-seo": "^22.9",
-        "timber/timber": "^2",
-        "stoutlogic/acf-builder": "^1.12"
-    },
-    "extra": {
-        "wordpress-install-dir": "wp"
-    },
-    "config": {
-        "optimize-autoloader": true,
-        "preferred-install": "dist",
-        "allow-plugins": {
-            "composer/installers": true,
-            "johnpbloch/wordpress-core-installer": true
-        }
-    },
-    "require-dev": {
-        "symfony/var-dumper": "^7.3"
+    "files": [
+      "wp-content/themes/starter-theme/functions/bootstrap.php"
+    ]
+  },
+  "authors": [
+    {
+      "name": "Si Morgan"
     }
+  ],
+  "minimum-stability": "stable",
+  "repositories": [
+    {
+      "type": "composer",
+      "url": "https://wpackagist.org"
+    }
+  ],
+  "require": {
+    "wpackagist-plugin/wordpress-seo": "^22.9",
+    "timber/timber": "^2",
+    "stoutlogic/acf-builder": "^1.12"
+  },
+  "extra": {
+    "wordpress-install-dir": "wp"
+  },
+  "config": {
+    "optimize-autoloader": true,
+    "preferred-install": "dist",
+    "allow-plugins": {
+      "composer/installers": true,
+      "johnpbloch/wordpress-core-installer": true
+    }
+  },
+  "require-dev": {
+    "symfony/var-dumper": "^7.3"
+  }
 }
