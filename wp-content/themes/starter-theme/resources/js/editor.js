@@ -1,3 +1,1 @@
-import "../css/editor.css";   // editor-specific overrides
-
-console.log("Editor loaded");
+import "../css/editor.css";   // Keep this for Vite css injection backend only

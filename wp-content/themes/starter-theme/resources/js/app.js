@@ -1,4 +1,1 @@
-import "../css/app.css";
-
-/* Frontend JS */
-console.log("Frontend loaded");
+import "../css/app.css";  // Keep this for Vite css injection
