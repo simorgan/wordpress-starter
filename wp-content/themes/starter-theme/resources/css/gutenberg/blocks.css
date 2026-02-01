@@ -1,3 +1,19 @@
 /**
 * Blocks.css
  */
+
+body {
+    @apply bg-pink-100;
+}
+
+.my-heading {
+    @apply bg-pink-300;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    @apply text-purple-600;
+}
+
+.wp-block-post-title {
+    background-color: red;
+}
