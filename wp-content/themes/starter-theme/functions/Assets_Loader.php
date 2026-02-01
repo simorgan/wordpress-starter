@@ -9,19 +9,26 @@ class Assets_Loader
 	private string $vite_dev_server;
 	private string $manifest_file;
 	private bool $is_dev;
+	private ?array $manifest_cache = null;
 
 	public function __construct()
 	{
 		$this->theme_dir = get_template_directory();
 		$this->theme_uri = get_template_directory_uri();
-		$this->vite_dev_server = 'http://localhost:5173';
+		// Configurable dev server URL via constant or fallback
+		$this->vite_dev_server = defined('VITE_DEV_SERVER') ? VITE_DEV_SERVER : 'http://localhost:5173';
 		$this->manifest_file = $this->theme_dir . '/dist/.vite/manifest.json';
 		$this->is_dev = $this->check_vite_dev_server();
 
+		// Enqueue frontend and editor assets
 		add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
 		add_action('enqueue_block_editor_assets', [$this, 'enqueue_editor_assets']);
 
+		// Inject Vite HMR client
 		add_action('wp_footer', [$this, 'inject_hmr_client']);
+
+		// Single filter for type="module" scripts in dev mode
+		add_filter('script_loader_tag', [$this, 'add_type_module'], 10, 2);
 	}
 
 	/**
@@ -29,7 +36,7 @@ class Assets_Loader
 	 */
 	private function check_vite_dev_server(): bool
 	{
-		$fp = @fsockopen('localhost', 5173);
+		$fp = @fsockopen(parse_url($this->vite_dev_server, PHP_URL_HOST), parse_url($this->vite_dev_server, PHP_URL_PORT));
 		if ($fp) {
 			fclose($fp);
 			return true;
@@ -38,116 +45,116 @@ class Assets_Loader
 	}
 
 	/**
-	 * Enqueue both CSS and JS assets
+	 * Add type="module" to dev scripts
+	 */
+	public function add_type_module(string $tag, string $handle): string
+	{
+		if ($this->is_dev && in_array($handle, ['theme-app', 'theme-editor'])) {
+			return str_replace('<script ', '<script type="module" ', $tag);
+		}
+		return $tag;
+	}
+
+	/**
+	 * Read and cache manifest.json
+	 */
+	private function get_manifest(): ?array
+	{
+		if ($this->manifest_cache !== null) {
+			return $this->manifest_cache;
+		}
+
+		if (!file_exists($this->manifest_file)) {
+			return null;
+		}
+
+		$manifest = json_decode(file_get_contents($this->manifest_file), true);
+		if (!is_array($manifest)) {
+			return null;
+		}
+
+		$this->manifest_cache = $manifest;
+		return $manifest;
+	}
+
+	/**
+	 * Enqueue frontend JS & CSS
 	 */
 	public function enqueue_assets(): void
 	{
 		if ($this->is_dev) {
+			wp_register_script('theme-app', $this->vite_dev_server . '/resources/js/app.js', [], null);
+			wp_enqueue_script('theme-app');
+			return;
+		}
 
-			// Development: load from Vite dev server
-			wp_register_script(
-				'theme-app',
-				$this->vite_dev_server . '/resources/js/app.js',
+		$manifest = $this->get_manifest();
+		if (!$manifest) return;
+
+		$entry = $manifest['resources/js/app.js'] ?? null;
+		if (!$entry || !isset($entry['file'])) return;
+
+		// JS
+		wp_enqueue_script(
+			'theme-app',
+			$this->theme_uri . '/dist/' . $entry['file'],
+			[],
+			null,
+			true
+		);
+
+		// CSS (multiple files)
+		foreach ($entry['css'] ?? [] as $css_file) {
+			$handle = 'theme-style-' . sanitize_title(pathinfo($css_file, PATHINFO_FILENAME));
+			wp_enqueue_style(
+				$handle,
+				$this->theme_uri . '/dist/' . $css_file,
 				[],
 				null
 			);
-
-			// Add type="module"
-			add_filter('script_loader_tag', function ($tag, $handle) {
-				if ($handle === 'theme-app') {
-					// Replace <script src=...> with <script type="module" src=...>
-					$tag = str_replace('<script ', '<script type="module" ', $tag);
-				}
-				return $tag;
-			}, 10, 2);
-
-			wp_enqueue_script('theme-app');
-		} else {
-			// Production: load from manifest.json
-			if (!file_exists($this->manifest_file)) return;
-
-			$manifest = json_decode(file_get_contents($this->manifest_file), true);
-			$js_entry = $manifest['resources/js/app.js'];
-			// JS
-			if (isset($manifest['resources/js/app.js']['file'])) {
-				wp_enqueue_script(
-					'theme-app',
-					$this->theme_uri . '/dist/' . $manifest['resources/js/app.js']['file'],
-					[],
-					null,
-					true
-				);
-			}
-
-			// Enqueue CSS (if any)
-			if (isset($js_entry['css']) && is_array($js_entry['css'])) {
-				foreach ($js_entry['css'] as $css_file) {
-					wp_enqueue_style(
-						'theme-style',
-						$this->theme_uri . '/dist/' . $css_file,
-						[],
-						null
-					);
-				}
-			}
 		}
 	}
 
 	/**
-	 * Gutenberg/editor assets
+	 * Enqueue Gutenberg/editor assets
 	 */
 	public function enqueue_editor_assets(): void
 	{
 		if ($this->is_dev) {
-			wp_register_script(
-				'theme-editor',
-				$this->vite_dev_server . '/resources/js/editor.js',
+			wp_register_script('theme-editor', $this->vite_dev_server . '/resources/js/editor.js', [], null);
+			wp_enqueue_script('theme-editor');
+			return;
+		}
+
+		$manifest = $this->get_manifest();
+		if (!$manifest) return;
+
+		$entry = $manifest['resources/js/editor.js'] ?? null;
+		if (!$entry || !isset($entry['file'])) return;
+
+		// JS
+		wp_enqueue_script(
+			'theme-editor',
+			$this->theme_uri . '/dist/' . $entry['file'],
+			[],
+			null,
+			true
+		);
+
+		// CSS (multiple files)
+		foreach ($entry['css'] ?? [] as $css_file) {
+			$handle = 'theme-editor-style-' . sanitize_title(pathinfo($css_file, PATHINFO_FILENAME));
+			wp_enqueue_style(
+				$handle,
+				$this->theme_uri . '/dist/' . $css_file,
 				[],
 				null
 			);
-
-			add_filter('script_loader_tag', function ($tag, $handle) {
-				if ($handle === 'theme-editor') {
-					return str_replace('<script ', '<script type="module" ', $tag);
-				}
-				return $tag;
-			}, 10, 2);
-
-			wp_enqueue_script('theme-editor');
-		} else {
-			if (!file_exists($this->manifest_file)) return;
-			$manifest = json_decode(file_get_contents($this->manifest_file), true);
-
-			if (!empty($manifest['resources/js/editor.js']['file'])) {
-				$entry = $manifest['resources/js/editor.js'];
-
-				// JS
-				wp_enqueue_script(
-					'theme-editor',
-					$this->theme_uri . '/dist/' . $entry['file'],
-					[],
-					null,
-					true
-				);
-
-				// CSS (prefixed app.css + editor.css)
-				if (!empty($entry['css']) && is_array($entry['css'])) {
-					foreach ($entry['css'] as $css_file) {
-						wp_enqueue_style(
-							'theme-editor-style',
-							$this->theme_uri . '/dist/' . $css_file,
-							[],
-							null
-						);
-					}
-				}
-			}
 		}
 	}
 
-
 	/**
-	 * Inject Vite HMR client in dev mode
+	 * Inject Vite HMR client for dev mode
 	 */
 	public function inject_hmr_client(): void
 	{
@@ -158,6 +165,5 @@ class Assets_Loader
   import "{$this->vite_dev_server}/@vite/client";
 </script>
 HTML;
-
 	}
 }
