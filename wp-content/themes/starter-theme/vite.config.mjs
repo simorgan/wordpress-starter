@@ -1,4 +1,5 @@
 import {defineConfig} from "vite";
+import tailwindcss from '@tailwindcss/vite'
 import path from "path";
 import wp from "vite-plugin-wordpress";
 // import phpTwigReloadPlugin from "./vite.page-reloader.js";
@@ -31,6 +32,7 @@ export default defineConfig({
             publicPath: "/wp-content/themes/starter-theme",
         }),
         prefixEditorCss(),
+        tailwindcss(),
     ],
     server: {
         port: 5173,

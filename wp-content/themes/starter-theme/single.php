@@ -18,5 +18,5 @@ if ($timber_post->post_type === 'post') {
 } else {
 	$template = ['templates/single-' . $timber_post->post_type . '.twig'];
 }
-
+  
 Timber::render($template, $context);

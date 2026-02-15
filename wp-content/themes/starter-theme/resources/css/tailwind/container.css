@@ -1,0 +1,20 @@
+@utility container {
+    margin-inline: auto;
+    padding-inline: 25px;
+    @variant sm {
+        @apply max-w-[200px];
+    }
+
+    @variant md {
+        @apply max-w-[400px];
+    }
+    @variant lg {
+        @apply max-w-[400px];
+    }
+    @variant xl {
+        @apply max-w-[1280px];
+    }
+    @variant 2xl {
+        @apply max-w-[1280px];
+    }
+}
