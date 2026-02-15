@@ -18,7 +18,7 @@ class Assets_Loader
 		// Configurable dev server URL via constant or fallback
 		$this->vite_dev_server = defined('VITE_DEV_SERVER') ? VITE_DEV_SERVER : 'http://localhost:5173';
 		$this->manifest_file = $this->theme_dir . '/dist/.vite/manifest.json';
-		$this->is_dev = $this->check_vite_dev_server();
+		$this->is_dev = defined('WP_ENV') && WP_ENV === 'development' && defined('VITE_DEV_ACTIVE') && VITE_DEV_ACTIVE;
 
 		// Enqueue frontend and editor assets
 		add_action('wp_enqueue_scripts', [$this, 'enqueue_assets']);
@@ -29,19 +29,6 @@ class Assets_Loader
 
 		// Single filter for type="module" scripts in dev mode
 		add_filter('script_loader_tag', [$this, 'add_type_module'], 10, 2);
-	}
-
-	/**
-	 * Check if Vite dev server is running
-	 */
-	private function check_vite_dev_server(): bool
-	{
-		$fp = @fsockopen(parse_url($this->vite_dev_server, PHP_URL_HOST), parse_url($this->vite_dev_server, PHP_URL_PORT));
-		if ($fp) {
-			fclose($fp);
-			return true;
-		}
-		return false;
 	}
 
 	/**
@@ -74,6 +61,7 @@ class Assets_Loader
 		}
 
 		$this->manifest_cache = $manifest;
+
 		return $manifest;
 	}
 

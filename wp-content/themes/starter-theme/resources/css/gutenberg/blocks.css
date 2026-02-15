@@ -7,7 +7,7 @@ body {
 }
 
 .my-heading {
-    @apply bg-pink-900;
+    @apply bg-blue-900;
 }
 
 h1, h2, h3, h4, h5, h6 {

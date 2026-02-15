@@ -20,4 +20,3 @@ if ($timber_post->post_type === 'post') {
 }
 
 Timber::render($template, $context);
-

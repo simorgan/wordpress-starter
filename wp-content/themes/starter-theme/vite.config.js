@@ -1,23 +1,27 @@
 import {defineConfig} from "vite";
 import path from "path";
 import wp from "vite-plugin-wordpress";
-import prefixEditorCss from "./cssPrefixer.config.js";
+// import phpTwigReloadPlugin from "./vite.page-reloader.js";
+import prefixEditorCss from "./vite.cssPrefixer.config.js";
 
 export default defineConfig({
     root: ".",
     build: {
         outDir: "dist",
         emptyOutDir: true,
+        manifest: true,
         rollupOptions: {
             input: {
                 app: path.resolve(__dirname, "resources/js/app.js"),
                 editor: path.resolve(__dirname, "resources/js/editor.js"),
             },
             output: {
-                entryFileNames: "assets/js/[name].js",
-                chunkFileNames: "assets/js/[name].js",
+                entryFileNames: "assets/js/[name].[hash].js",
+                chunkFileNames: "assets/js/[name].[hash].js",
                 assetFileNames: ({name}) =>
-                    /\.(css)$/.test(name ?? "") ? "assets/css/[name].[ext]" : "assets/[name].[ext]",
+                    /\.css$/.test(name ?? "")
+                        ? "assets/css/[name].[hash][extname]"
+                        : "assets/[name].[hash][extname]",
             },
         },
     },

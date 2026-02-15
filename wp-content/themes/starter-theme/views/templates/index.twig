@@ -1,8 +1,10 @@
 {% extends "base/base.twig" %}
 {% block content %}
-    <h2 class="my-heading">Index page</h2>
-    <p>{{ qux }}</p>
-    {% for post in posts %}
-    {% endfor %}
-    {{ post.content }}
+    <div class="container">
+        <h2 class="my-heading">Index page</h2>
+        <p class="text-pink-900 font-black text-3xl uppercase my-10">hello</p>
+        {% for post in posts %}
+        {% endfor %}
+        {{ post.content }}
+    </div>
 {% endblock %}

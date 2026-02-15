@@ -8,7 +8,7 @@ const EXCLUDE = ["html", "body", ".wp-block.acf-block-preview"];
 export default function prefixEditorCss() {
     return {
         name: "prefix-editor-css",
-
+ 
         // --- Build mode ---
         generateBundle(_, bundle) {
             Object.entries(bundle).forEach(([fileName, asset]) => {
